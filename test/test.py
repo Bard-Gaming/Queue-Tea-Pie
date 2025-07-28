@@ -1,8 +1,8 @@
 import logging
 from random import randint
 
-from src import sqs_handler
-from src.models import SQSEventRecord
+from qtp import sqs_handler
+from qtp.models import SQSEventRecord
 
 
 @sqs_handler
