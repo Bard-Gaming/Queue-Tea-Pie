@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from qtp import sqs_handler, SQSEventHandler
+from qtp import sqs_handler, SQSEventHandler, generate_request
 from qtp.models import SQSEventRecord
 
 
@@ -11,6 +11,16 @@ class TestSQSHandlerDecorator(TestCase):
             issubclass(handler._handler, SQSEventHandler),
             "'handler._handler' is not a subclass of 'SQSEventHandler'"
         )
+
+        is_called = False
+        def process(record: SQSEventRecord) -> None:
+            nonlocal is_called
+            is_called = True
+
+        handler.process(process)
+        handler._handler(generate_request("a")).process_record("a")  # NOQA -- check if process_record() calls process()
+
+        self.assertTrue(is_called)
 
     def test_process(self):
         handler = sqs_handler()
