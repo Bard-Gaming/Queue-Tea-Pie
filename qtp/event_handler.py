@@ -26,7 +26,7 @@ class SQSEventHandler(abc.ABC):
             ...  # process record here
 
         # optional:
-        def cleanup_record(record: SQSEventRecord) -> bool | None:
+        def cleanup_record(record: SQSEventRecord, error: Exception) -> bool | None:
             ...  # clean up any records that caused errors here
 
     def lambda_handler(event: dict, context: object) -> dict:

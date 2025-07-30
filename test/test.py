@@ -3,6 +3,7 @@ from random import randint
 
 from qtp import sqs_handler
 from qtp.models import SQSEventRecord
+from qtp.testing import generate_request
 
 
 @sqs_handler
@@ -23,22 +24,7 @@ def lambda_handler(record: SQSEventRecord, error: Exception) -> bool | None:
 # SQS event to see how it works:
 def mock_lambda_exec() -> None:
     logging.basicConfig(level="INFO")
-    simulated_event = {
-        "Records": [
-            {
-                "messageId": "287364872634872364",
-                "body": "hi!",
-            },
-            {
-                "messageId": "752836587263875623",
-                "body": "cool body"
-            },
-            {
-                "messageId": "976487264872634872",
-                "body": "bye!",
-            }
-        ]
-    }
+    simulated_event = generate_request("hi!", "cool body", "bye!")
     context = object()
 
     response = lambda_handler(simulated_event, context)

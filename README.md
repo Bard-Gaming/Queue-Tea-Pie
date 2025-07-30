@@ -10,6 +10,7 @@ pip install aws-qtp
 ```
 
 ## Using QTP
+### Simple example
 The following example is a fully working usage of QTP:
 ```python
 from qtp import sqs_handler
@@ -35,8 +36,9 @@ The lambda function would produce the following logs with a message containing t
 Whilst the error we raised appears correctly in the CloudWatch console, this doesn't cause
 the program to exit, meaning other messages can still be processed by the lambda function.
 
-Since the message has failed to process, it will land right back in the queue in order to
-be processed again.
+### Error handling
+Since the previous message has failed to process, it will land right back in the queue in
+order to be processed again.
 However, you might want to prevent the message from getting back into the queue, or you
 might want to perform some cleanup actions before the message gets back into the queue.
 
@@ -55,8 +57,8 @@ def lambda_handler(record: SQSEventRecord) -> None:
         raise ValueError("Error found!")
 
 @lambda_handler.cleanup
-def lambda_handler(record: SQSEventRecord) -> bool | None:
-    print("Cleaning up...")
+def lambda_handler(record: SQSEventRecord, error: Exception) -> bool | None:
+    print(f"Error that was raised: {error}")
     if record.body == "this is an error":
         return True  # don't add message/record back to queue
 
@@ -66,7 +68,7 @@ def lambda_handler(record: SQSEventRecord) -> bool | None:
 ```
 *If you've used Python's builtin ``property`` decorator, you should be familiar with how the QTP ``sqs_handler`` works.*
 
-## Custom Behaviour
+### Custom Behaviour
 If you wish to further customize the behaviour of the SQS handler,
 you can use the ``SQSEventHandler`` class.
 
@@ -84,8 +86,8 @@ class MySQSHandler(SQSEventHandler):
         if record.body == "this is an error":
             raise ValueError("Error found!")
     
-    def cleanup_record(self, record: SQSEventRecord) -> bool | None:
-        print("Cleaning up...")
+    def cleanup_record(self, record: SQSEventRecord, error: Exception) -> bool | None:
+        print(f"Error that was raised: {error}")
         return record.body == "this is an error"
 
 
@@ -112,8 +114,8 @@ class MySQSHandler(SQSEventHandler):
             self.record_data = "not cool :("
             raise ValueError("Error found!")
     
-    def cleanup_record(self, record: SQSEventRecord) -> bool | None:
-        print("Cleaning up...")
+    def cleanup_record(self, record: SQSEventRecord, error: Exception) -> bool | None:
+        print(f"Error that was raised: {error}")
         return self.record_data == "not cool :("
 
 

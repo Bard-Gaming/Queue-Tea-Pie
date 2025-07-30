@@ -27,7 +27,7 @@ class sqs_handler:  # NOQA (use as function so keep snake-case)
         ...  # process record
 
     @lambda_handler.cleanup
-    def lambda_handler(record: SQSEventRecord) -> bool | None:
+    def lambda_handler(record: SQSEventRecord, error: Exception) -> bool | None:
         ...  # record cleanup
 
 
@@ -37,7 +37,7 @@ class sqs_handler:  # NOQA (use as function so keep snake-case)
     def lambda_record_process(record: SQSEventRecord) -> None:
         ...  # process record
 
-    def lambda_record_cleanup(record: SQSEventRecord) -> bool | None:
+    def lambda_record_cleanup(record: SQSEventRecord, error: Exception) -> bool | None:
         ...  # record cleanup
 
     lambda_handler = sqs_handler(lambda_record_process, lambda_cleanup)
