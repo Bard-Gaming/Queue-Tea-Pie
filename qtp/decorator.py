@@ -43,7 +43,7 @@ class sqs_handler:  # NOQA (use as function so keep snake-case)
     lambda_handler = sqs_handler(lambda_record_process, lambda_cleanup)
     """
 
-    __slots__ = ("_record_processor", "_record_cleanup", "_handler", "__name__")
+    __slots__ = ("_record_processor", "_record_cleanup", "__name__")
 
     def __init__(
             self,
@@ -52,38 +52,29 @@ class sqs_handler:  # NOQA (use as function so keep snake-case)
     ) -> None:
         self._record_processor = _NOTHING_FNC
         self._record_cleanup = _NOTHING_FNC
-        self._handler: Type[SQSEventHandler] | None = None
         self.__name__ = ""
 
         self._register(record_processor=record_process, record_cleanup=record_cleanup)
 
-    def _register(
-            self,
-            *,
-            record_processor: _RECORD_PROCESSOR_FNC = None,
-            record_cleanup: _RECORD_CLEANUP_FNC = None
-    ) -> None:
-        record_processor = record_processor if record_processor is not None else self._record_processor
-        record_cleanup = record_cleanup if record_cleanup is not None else self._record_cleanup
-        self._record_processor = record_processor
-        self._record_cleanup = record_cleanup
-        self.__name__ = self._record_processor.__name__
+    @property
+    def _handler(self) -> Type["SQSEventHandler"]:
+        decorator = self
 
         class DefaultSQSHandler(SQSEventHandler):
             def process_record(self, record: SQSEventRecord) -> None:
-                record_processor(record)
+                decorator._record_processor(record)
 
             def cleanup_record(self, record: SQSEventRecord, error: Exception) -> bool | None:
-                return record_cleanup(record, error)
+                return decorator._record_cleanup(record, error)
 
-        self._handler = DefaultSQSHandler
+        return DefaultSQSHandler
 
     def process(self, fnc: _RECORD_PROCESSOR_FNC) -> "sqs_handler":
-        self._register(record_processor=fnc)
+        self._record_processor = fnc
         return self
 
     def cleanup(self, fnc: _RECORD_CLEANUP_FNC) -> "sqs_handler":
-        self._register(record_cleanup=fnc)
+        self._record_cleanup = fnc
         return self
 
     def __call__(self, event: dict, context: object) -> dict:
