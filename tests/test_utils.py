@@ -1,21 +1,20 @@
-from unittest import TestCase
+import pytest
 
 from qtp import generate_request
 
 
-class Test(TestCase):
-    def test_generate_request_single(self) -> None:
-        body = "hihi"
-        request = generate_request(body)
+def test_generate_request_single() -> None:
+    body = "hihi"
+    request = generate_request(body)
 
-        self.assertEqual(request.get("Records", [{}])[0].get("body"), body)
+    assert request.get("Records", [{}])[0].get("body") == body
 
-    def test_generate_request_empty(self) -> None:
-        request = generate_request()
-        expected = {"Records": []}
+def test_generate_request_empty() -> None:
+    request = generate_request()
+    expected = {"Records": []}
 
-        self.assertEqual(request, expected)
+    assert request == expected
 
-    def test_generate_request_invalid_type(self) -> None:
-        with self.assertRaises(TypeError):
-            generate_request(32)
+def test_generate_request_invalid_type() -> None:
+    with pytest.raises(TypeError):
+        generate_request(32)
