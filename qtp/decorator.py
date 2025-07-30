@@ -50,11 +50,9 @@ class sqs_handler:  # NOQA (use as function so keep snake-case)
             record_process: _RECORD_PROCESSOR_FNC = None,
             record_cleanup: _RECORD_CLEANUP_FNC = None
     ) -> None:
-        self._record_processor = _NOTHING_FNC
-        self._record_cleanup = _NOTHING_FNC
+        self._record_processor = record_process if record_process is not None else _NOTHING_FNC
+        self._record_cleanup = record_cleanup if record_cleanup is not None else _NOTHING_FNC
         self.__name__ = ""
-
-        self._register(record_processor=record_process, record_cleanup=record_cleanup)
 
     @property
     def _handler(self) -> Type["SQSEventHandler"]:
