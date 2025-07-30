@@ -14,7 +14,8 @@ def lambda_handler(record: SQSEventRecord) -> None:
     print(f"Successfully processed {record !r}")
 
 @lambda_handler.cleanup
-def lambda_handler(record: SQSEventRecord) -> bool | None:
+def lambda_handler(record: SQSEventRecord, error: Exception) -> bool | None:
+    print(error)
     print(f"Encountered error when processing {record !r}")
 
 

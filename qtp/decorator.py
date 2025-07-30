@@ -8,9 +8,9 @@ __all__ = ["sqs_handler"]
 
 
 _RECORD_PROCESSOR_FNC = Callable[[SQSEventRecord], None]
-_RECORD_CLEANUP_FNC = Callable[[SQSEventRecord], bool | None]
+_RECORD_CLEANUP_FNC = Callable[[SQSEventRecord, Exception], bool | None]
 
-_NOTHING_FNC = lambda *args, **wargs: None
+_NOTHING_FNC = lambda *args, **kwargs: None
 
 
 class sqs_handler:  # NOQA (use as function so keep snake-case)
@@ -73,8 +73,8 @@ class sqs_handler:  # NOQA (use as function so keep snake-case)
             def process_record(self, record: SQSEventRecord) -> None:
                 record_processor(record)
 
-            def cleanup_record(self, record: SQSEventRecord) -> bool | None:
-                return record_cleanup(record)
+            def cleanup_record(self, record: SQSEventRecord, error: Exception) -> bool | None:
+                return record_cleanup(record, error)
 
         self._handler = DefaultSQSHandler
 

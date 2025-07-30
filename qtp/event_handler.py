@@ -90,7 +90,7 @@ class SQSEventHandler(abc.ABC):
         """
         pass  # let user define how you should process messages
 
-    def cleanup_record(self, record: SQSEventRecord) -> bool | None:
+    def cleanup_record(self, record: SQSEventRecord, error: Exception) -> bool | None:
         """
         SQS Event handler record cleanup method.
 
@@ -117,7 +117,7 @@ class SQSEventHandler(abc.ABC):
                 f"Failed to process {record !r}: {error.__class__.__name__}{': ' if str(error) else ''}{error}"
             )
 
-            if not self.cleanup_record(record):
+            if not self.cleanup_record(record, error):
                 self.failed_ids.add(record.messageId)
 
     def response(self) -> dict:
