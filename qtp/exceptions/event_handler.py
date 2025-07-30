@@ -1,6 +1,3 @@
-__all__ = ["SQSEventHandlerError", "SQSInvalidEventError"]
-
-
 class SQSEventHandlerError(Exception):
     pass
 
